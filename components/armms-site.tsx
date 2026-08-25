@@ -11,7 +11,7 @@ const domains = [
   { n: '03', title: 'MECHANICAL ENGINEERING', text: 'CAD, mechanisms, materials, simulation, and fabrication.', icon: Wrench },
   { n: '04', title: 'AUTOMATION', text: 'Embedded systems, IoT, and systems that respond.', icon: Settings2 },
 ]
-const team = ['President', 'Vice President', 'General Secretary', 'Technical Lead', 'AI Lead', 'Robotics Lead', 'Mechanical Lead', 'Events Lead', 'Design Lead']
+const team = ['President', 'Vice President', 'General Secretary']
 const faqs = [
   ['Who can join ARMSS?', 'Any student curious about AI, robotics, mechanical engineering, or building with others can join. No prior experience is required.'],
   ['Do I need my own hardware?', 'No. ARMSS provides shared access to components, tools, and labs for workshops and project teams.'],
@@ -45,8 +45,8 @@ export function FAQ() { const [active, setActive] = useState<number | null>(null
 
 export function Team() { return <section id="team" className="section section-light"><div className="shell"><p className="section-kicker">07 / THE CREW <span /></p><h2 className="display-title">THE PEOPLE<br /><em>OF ARMSS.</em></h2><div className="team-grid">{team.map((role, i) => <article className="team-card" key={role}><div className="team-avatar"><span>{String(i + 1).padStart(2, '0')}</span><Network size={28} /></div><p className="team-role">{role}</p><h3>{role === 'President' ? 'Your name here' : 'ARMSS member'}</h3></article>)}</div></div></section> }
 
-export function CTA() { return <section id="join" className="cta"><div className="shell"><p className="section-kicker">YOUR NEXT MOVE <span /></p><h2 className="cta-title">INNOVATE.<br /><em>EXPERIMENT.</em></h2><p className="cta-copy">Join ARMSS and find your next thing to build.</p><a href={joinUrl} target="_blank" rel="noopener noreferrer" className="button button-blue mt-9">JOIN ARMSS <ArrowUpRight size={17} /></a></div></section> }
+
 
 export function Footer() { return <footer id="footer" className="footer"><div className="shell"><div className="footer-top"><div><Mark /><p className="footer-description">Artificial Intelligence, Robotics &amp;<br />Mechanical Engineering Student Society<br /><span>Guru Nanak Dev University, Amritsar</span></p></div><div className="footer-links"><div><p className="footer-label">EXPLORE</p><a href="#about">About</a><a href="#domains">Domains</a><a href="#workshops">Workshops</a><a href="#techtales">TechTales</a></div><div><p className="footer-label">CONNECT</p><a href="#membership">Membership</a><a href="#team">Team</a><a href={joinUrl}>Join ARMSS</a></div><div><p className="footer-label">FIND US</p><a href="https://www.instagram.com/armss.gndu/" target="_blank" rel="noopener noreferrer">Instagram</a><a href="mailto:armss@example.com">Email</a></div></div></div><div className="footer-bottom"><span>ARMSS / GNDU</span><span>© 2025 ARMSS SOCIETY</span><span>armss@example.com</span></div></div></footer> }
 
-export default function ArmmsSite() { return <><Navbar /><main><Hero /><About /><Domains /><Workshops /><TechTales /><Hackathon /><Membership /><FAQ /><Team /><CTA /></main><Footer /></> }
+export default function ArmmsSite() { return <><Navbar /><main><Hero /><About /><Domains /><Workshops /><TechTales /><Hackathon /><Membership /><FAQ /><Team /></main><Footer /></> }
