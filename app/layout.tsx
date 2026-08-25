@@ -3,14 +3,14 @@ import type { Metadata, Viewport } from 'next'
 import './globals.css'
 
 export const metadata: Metadata = {
-  title: 'ARMSS | Build the Future',
+  title: 'ARMSS | Innovate. Engineer. Build.',
   description: 'Artificial Intelligence, Robotics & Mechanical Engineering Student Society.',
   generator: 'v0.app',
 }
 
 export const viewport: Viewport = {
-  colorScheme: 'dark',
-  themeColor: '#071323',
+  colorScheme: 'light',
+  themeColor: '#ECEAE2',
   width: 'device-width',
   initialScale: 1,
 }
