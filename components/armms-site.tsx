@@ -21,6 +21,7 @@ const faqs = [
 function Mark({ light = false }: { light?: boolean }) { return <div className={`flex items-center gap-3 ${light ? 'text-white' : 'text-foreground'}`}><span className="armms-mark"><i /><i /><i /></span><span className="font-mono text-sm font-bold tracking-[0.22em]">ARMSS</span></div> }
 function Reveal({ children, className = '' }: { children: React.ReactNode; className?: string }) { return <div className={`reveal ${className}`}>{children}</div> }
 
+
 export function Navbar() {
   const [open, setOpen] = useState(false)
   const links = [['About', 'about'], ['Domains', 'domains'], ['Workshops', 'workshops'], ['TechTales', 'techtales'], ['Membership', 'membership'], ['Team', 'team']]
