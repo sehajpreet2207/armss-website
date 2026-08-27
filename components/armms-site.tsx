@@ -91,40 +91,13 @@ function ParticleField() {
   return <canvas ref={canvasRef} className="particle-field" aria-hidden="true" />
 }
 
-function JellyfishFollower() {
-  const jellyfishRef = useRef<HTMLDivElement>(null)
-  const target = useRef({ x: 0, y: 0 })
-  const position = useRef({ x: 0, y: 0 })
-
-  useEffect(() => {
-    const handlePointerMove = (event: PointerEvent) => { target.current = { x: event.clientX, y: event.clientY } }
-    const handlePointerLeave = () => { if (jellyfishRef.current) jellyfishRef.current.style.opacity = '0' }
-    const handlePointerEnter = () => { if (jellyfishRef.current) jellyfishRef.current.style.opacity = '1' }
-    const hero = document.getElementById('home')
-    let frame = 0
-    const animate = () => {
-      position.current.x += (target.current.x - position.current.x) * 0.1
-      position.current.y += (target.current.y - position.current.y) * 0.1
-      if (jellyfishRef.current) jellyfishRef.current.style.transform = `translate3d(${position.current.x}px, ${position.current.y}px, 0)`
-      frame = requestAnimationFrame(animate)
-    }
-    hero?.addEventListener('pointermove', handlePointerMove)
-    hero?.addEventListener('pointerenter', handlePointerEnter)
-    hero?.addEventListener('pointerleave', handlePointerLeave)
-    frame = requestAnimationFrame(animate)
-    return () => { hero?.removeEventListener('pointermove', handlePointerMove); hero?.removeEventListener('pointerenter', handlePointerEnter); hero?.removeEventListener('pointerleave', handlePointerLeave); cancelAnimationFrame(frame) }
-  }, [])
-
-  return <div ref={jellyfishRef} className="jellyfish-follower" aria-hidden="true"><span className="jellyfish-dome" /><span className="jellyfish-tentacles" /></div>
-}
-
 export function Navbar() {
   const [open, setOpen] = useState(false)
   const links = [['About', 'about'], ['Domains', 'domains'], ['Workshops', 'workshops'], ['TechTales', 'techtales'], ['Membership', 'membership'], ['Team', 'team']]
   return <header className="navbar"><div className="shell flex h-20 items-center justify-between"><a href="#home" aria-label="ARMSS home"><Mark /></a><nav className="hidden items-center gap-7 md:flex">{links.map(([label, id]) => <a key={id} href={`#${id}`} className="nav-link">{label}</a>)}</nav><a href={joinUrl} target="_blank" rel="noopener noreferrer" className="button button-blue hidden md:inline-flex">JOIN ARMSS <ArrowUpRight size={16} /></a><button className="md:hidden" aria-label={open ? 'Close menu' : 'Open menu'} onClick={() => setOpen(!open)}>{open ? <X /> : <Menu />}</button></div>{open && <div className="mobile-menu md:hidden">{links.map(([label, id]) => <a key={id} href={`#${id}`} onClick={() => setOpen(false)}>{label}<MoveRight size={16} /></a>)}<a href={joinUrl} target="_blank" rel="noopener noreferrer">JOIN ARMSS <ArrowUpRight size={16} /></a></div>}</header>
 }
 
-export function Hero() { return <section id="home" className="hero"><ParticleField /><JellyfishFollower /><div className="shell hero-inner"><Reveal><p className="section-kicker">ARMSS / GNDU <span /></p><h1 className="hero-title">ARMSS<em>.</em></h1><p className="hero-copy">Artificial Intelligence, Robotics &amp; Mechanical Engineering Student Society.</p><div className="hero-subline"><span>GNDU / AMRITSAR</span></div><div className="mt-9 flex flex-wrap gap-3"><a href={joinUrl} target="_blank" rel="noopener noreferrer" className="button button-blue">JOIN ARMSS <ArrowUpRight size={17} /></a><a href="#about" className="button button-outline">EXPLORE <MoveRight size={17} /></a></div></Reveal></div></section> }
+export function Hero() { return <section id="home" className="hero"><ParticleField /><div className="shell hero-inner"><Reveal><p className="section-kicker">ARMSS / GNDU <span /></p><h1 className="hero-title">ARMSS<em>.</em></h1><p className="hero-copy">Artificial Intelligence, Robotics &amp; Mechanical Engineering Student Society.</p><div className="hero-subline"><span>GNDU / AMRITSAR</span></div><div className="mt-9 flex flex-wrap gap-3"><a href={joinUrl} target="_blank" rel="noopener noreferrer" className="button button-blue">JOIN ARMSS <ArrowUpRight size={17} /></a><a href="#about" className="button button-outline">EXPLORE <MoveRight size={17} /></a></div></Reveal></div></section> }
 
 export function About() { return <section id="about" className="section section-light"><div className="shell"><Reveal><p className="section-kicker">01 / ABOUT <span /></p></Reveal><div className="about-grid"><Reveal><h2 className="display-title">MORE THAN<br /><em>A SOCIETY.</em></h2></Reveal><Reveal><p className="lead-copy">A place to turn curiosity into capability.</p><p className="body-copy">ARMSS brings together students who want to learn beyond the classroom, make useful things, and work across disciplines. Start anywhere. Build with us.</p></Reveal></div><div className="principles">{principles.map(([n, title, text]) => <div className="principle" key={n}><span className="principle-num">{n}</span><h3>{title}</h3><p>{text}</p></div>)}</div></div></section> }
 
