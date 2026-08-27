@@ -39,19 +39,22 @@ function JellyfishFollower() {
   const position = useRef({ x: 0, y: 0 })
 
   useEffect(() => {
-    const handlePointerMove = (event: PointerEvent) => {
-      target.current = { x: event.clientX, y: event.clientY }
-    }
+    const handlePointerMove = (event: PointerEvent) => { target.current = { x: event.clientX, y: event.clientY } }
+    const handlePointerLeave = () => { if (jellyfishRef.current) jellyfishRef.current.style.opacity = '0' }
+    const handlePointerEnter = () => { if (jellyfishRef.current) jellyfishRef.current.style.opacity = '1' }
+    const hero = document.getElementById('home')
     let frame = 0
     const animate = () => {
-      position.current.x += (target.current.x - position.current.x) * 0.08
-      position.current.y += (target.current.y - position.current.y) * 0.08
+      position.current.x += (target.current.x - position.current.x) * 0.1
+      position.current.y += (target.current.y - position.current.y) * 0.1
       if (jellyfishRef.current) jellyfishRef.current.style.transform = `translate3d(${position.current.x}px, ${position.current.y}px, 0)`
       frame = requestAnimationFrame(animate)
     }
-    window.addEventListener('pointermove', handlePointerMove)
+    hero?.addEventListener('pointermove', handlePointerMove)
+    hero?.addEventListener('pointerenter', handlePointerEnter)
+    hero?.addEventListener('pointerleave', handlePointerLeave)
     frame = requestAnimationFrame(animate)
-    return () => { window.removeEventListener('pointermove', handlePointerMove); cancelAnimationFrame(frame) }
+    return () => { hero?.removeEventListener('pointermove', handlePointerMove); hero?.removeEventListener('pointerenter', handlePointerEnter); hero?.removeEventListener('pointerleave', handlePointerLeave); cancelAnimationFrame(frame) }
   }, [])
 
   return <div ref={jellyfishRef} className="jellyfish-follower" aria-hidden="true"><span className="jellyfish-dome" /><span className="jellyfish-tentacles" /></div>
