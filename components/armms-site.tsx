@@ -33,6 +33,64 @@ const faqs = [
 function Mark({ light = false }: { light?: boolean }) { return <div className={`flex items-center gap-3 ${light ? 'text-white' : 'text-foreground'}`}><span className="armms-mark"><i /><i /><i /></span><span className="font-mono text-sm font-bold tracking-[0.22em]">ARMSS</span></div> }
 function Reveal({ children, className = '' }: { children: React.ReactNode; className?: string }) { return <div className={`reveal ${className}`}>{children}</div> }
 
+function ParticleField() {
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+
+  useEffect(() => {
+    const canvas = canvasRef.current
+    const hero = document.getElementById('home')
+    if (!canvas || !hero || window.matchMedia('(prefers-reduced-motion: reduce), (pointer: coarse)').matches) return
+    const context = canvas.getContext('2d')
+    if (!context) return
+    const points = Array.from({ length: 110 }, (_, index) => ({
+      x: (index * 83) % 100,
+      y: (index * 47) % 100,
+      size: index % 7 === 0 ? 1.4 : 0.9,
+      accent: index % 29 === 0,
+    }))
+    const pointer = { x: -1000, y: -1000 }
+    let frame = 0
+    const resize = () => {
+      const ratio = Math.min(window.devicePixelRatio || 1, 2)
+      canvas.width = hero.clientWidth * ratio
+      canvas.height = hero.clientHeight * ratio
+      canvas.style.width = `${hero.clientWidth}px`
+      canvas.style.height = `${hero.clientHeight}px`
+      context.setTransform(ratio, 0, 0, ratio, 0, 0)
+    }
+    const move = (event: PointerEvent) => {
+      const bounds = hero.getBoundingClientRect()
+      pointer.x = event.clientX - bounds.left
+      pointer.y = event.clientY - bounds.top
+    }
+    const draw = () => {
+      const width = hero.clientWidth
+      const height = hero.clientHeight
+      context.clearRect(0, 0, width, height)
+      points.forEach((point) => {
+        const baseX = (point.x / 100) * width
+        const baseY = (point.y / 100) * height
+        const dx = baseX - pointer.x
+        const dy = baseY - pointer.y
+        const distance = Math.sqrt(dx * dx + dy * dy)
+        const influence = Math.max(0, 1 - distance / 130)
+        const x = baseX + (dx / Math.max(distance, 1)) * influence * 7
+        const y = baseY + (dy / Math.max(distance, 1)) * influence * 7
+        context.fillStyle = point.accent ? 'rgba(164, 113, 184, .42)' : 'rgba(36, 87, 255, .38)'
+        context.fillRect(x, y, point.size, point.size)
+      })
+      frame = requestAnimationFrame(draw)
+    }
+    resize()
+    window.addEventListener('resize', resize)
+    hero.addEventListener('pointermove', move)
+    frame = requestAnimationFrame(draw)
+    return () => { window.removeEventListener('resize', resize); hero.removeEventListener('pointermove', move); cancelAnimationFrame(frame) }
+  }, [])
+
+  return <canvas ref={canvasRef} className="particle-field" aria-hidden="true" />
+}
+
 function JellyfishFollower() {
   const jellyfishRef = useRef<HTMLDivElement>(null)
   const target = useRef({ x: 0, y: 0 })
@@ -66,7 +124,7 @@ export function Navbar() {
   return <header className="navbar"><div className="shell flex h-20 items-center justify-between"><a href="#home" aria-label="ARMSS home"><Mark /></a><nav className="hidden items-center gap-7 md:flex">{links.map(([label, id]) => <a key={id} href={`#${id}`} className="nav-link">{label}</a>)}</nav><a href={joinUrl} target="_blank" rel="noopener noreferrer" className="button button-blue hidden md:inline-flex">JOIN ARMSS <ArrowUpRight size={16} /></a><button className="md:hidden" aria-label={open ? 'Close menu' : 'Open menu'} onClick={() => setOpen(!open)}>{open ? <X /> : <Menu />}</button></div>{open && <div className="mobile-menu md:hidden">{links.map(([label, id]) => <a key={id} href={`#${id}`} onClick={() => setOpen(false)}>{label}<MoveRight size={16} /></a>)}<a href={joinUrl} target="_blank" rel="noopener noreferrer">JOIN ARMSS <ArrowUpRight size={16} /></a></div>}</header>
 }
 
-export function Hero() { return <section id="home" className="hero"><JellyfishFollower /><div className="shell hero-inner"><Reveal><p className="section-kicker">ARMSS / GNDU <span /></p><h1 className="hero-title">ARMSS<em>.</em></h1><p className="hero-copy">Artificial Intelligence, Robotics &amp; Mechanical Engineering Student Society.</p><div className="hero-subline"><span>GNDU / AMRITSAR</span></div><div className="mt-9 flex flex-wrap gap-3"><a href={joinUrl} target="_blank" rel="noopener noreferrer" className="button button-blue">JOIN ARMSS <ArrowUpRight size={17} /></a><a href="#about" className="button button-outline">EXPLORE <MoveRight size={17} /></a></div></Reveal></div></section> }
+export function Hero() { return <section id="home" className="hero"><ParticleField /><JellyfishFollower /><div className="shell hero-inner"><Reveal><p className="section-kicker">ARMSS / GNDU <span /></p><h1 className="hero-title">ARMSS<em>.</em></h1><p className="hero-copy">Artificial Intelligence, Robotics &amp; Mechanical Engineering Student Society.</p><div className="hero-subline"><span>GNDU / AMRITSAR</span></div><div className="mt-9 flex flex-wrap gap-3"><a href={joinUrl} target="_blank" rel="noopener noreferrer" className="button button-blue">JOIN ARMSS <ArrowUpRight size={17} /></a><a href="#about" className="button button-outline">EXPLORE <MoveRight size={17} /></a></div></Reveal></div></section> }
 
 export function About() { return <section id="about" className="section section-light"><div className="shell"><Reveal><p className="section-kicker">01 / ABOUT <span /></p></Reveal><div className="about-grid"><Reveal><h2 className="display-title">MORE THAN<br /><em>A SOCIETY.</em></h2></Reveal><Reveal><p className="lead-copy">A place to turn curiosity into capability.</p><p className="body-copy">ARMSS brings together students who want to learn beyond the classroom, make useful things, and work across disciplines. Start anywhere. Build with us.</p></Reveal></div><div className="principles">{principles.map(([n, title, text]) => <div className="principle" key={n}><span className="principle-num">{n}</span><h3>{title}</h3><p>{text}</p></div>)}</div></div></section> }
 
