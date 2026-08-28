@@ -42,11 +42,18 @@ function ParticleField() {
     if (!canvas || !hero || window.matchMedia('(prefers-reduced-motion: reduce), (pointer: coarse)').matches) return
     const context = canvas.getContext('2d')
     if (!context) return
-    const points = Array.from({ length: 110 }, (_, index) => ({
-      x: (index * 83) % 100,
-      y: (index * 47) % 100,
-      size: index % 7 === 0 ? 1.4 : 0.9,
-      accent: index % 29 === 0,
+    const random = (seed: number) => {
+      const value = Math.sin(seed * 12.9898) * 43758.5453
+      return value - Math.floor(value)
+    }
+    const points = Array.from({ length: 260 }, (_, index) => ({
+      baseX: random(index * 2 + 1),
+      baseY: random(index * 2 + 2),
+      x: 0,
+      y: 0,
+      size: random(index * 3 + 4) > 0.82 ? 2 : 1,
+      dash: random(index * 5 + 7) > 0.72,
+      accent: random(index * 7 + 9) > 0.97,
     }))
     const pointer = { x: -1000, y: -1000 }
     let frame = 0
