@@ -46,15 +46,17 @@ function ParticleField() {
       const value = Math.sin(seed * 12.9898) * 43758.5453
       return value - Math.floor(value)
     }
+    const colors = ['#ea4335', '#4285f4', '#fbbc05', '#34a853', '#202124']
     const points = Array.from({ length: 260 }, (_, index) => ({
-      baseX: random(index * 2 + 1),
-      baseY: random(index * 2 + 2),
+      homeX: random(index * 2 + 1),
+      homeY: random(index * 2 + 2),
       x: 0,
       y: 0,
-      size: random(index * 3 + 4) > 0.82 ? 2 : 1,
-      dash: random(index * 5 + 7) > 0.72,
-      accent: random(index * 7 + 9) > 0.97,
-      phase: random(index * 11 + 12) * Math.PI * 2,
+      vx: 0,
+      vy: 0,
+      size: random(index * 3 + 4) > 0.86 ? 2 : 1,
+      dash: random(index * 5 + 7) > 0.8,
+      color: colors[index % colors.length],
     }))
     const pointer = { x: -1000, y: -1000 }
     let frame = 0
@@ -76,21 +78,24 @@ function ParticleField() {
       const height = hero.clientHeight
       context.clearRect(0, 0, width, height)
       points.forEach((point) => {
-        const baseX = point.baseX * width
-        const baseY = point.baseY * height
-        if (point.x === 0 && point.y === 0) { point.x = baseX; point.y = baseY }
+        const homeX = point.homeX * width
+        const homeY = point.homeY * height
+        if (point.x === 0 && point.y === 0) { point.x = homeX; point.y = homeY }
         const dx = point.x - pointer.x
         const dy = point.y - pointer.y
         const distance = Math.sqrt(dx * dx + dy * dy)
-        const influence = Math.max(0, 1 - distance / 190)
-        const orbit = influence * (0.018 + Math.sin(time * 0.001 + point.phase) * 0.008)
-        const radiusPush = influence * 0.18
-        const targetX = pointer.x + (dx * Math.cos(orbit) - dy * Math.sin(orbit)) * (1 + radiusPush)
-        const targetY = pointer.y + (dx * Math.sin(orbit) + dy * Math.cos(orbit)) * (1 + radiusPush)
-        const settle = 0.08 + influence * 0.08
-        point.x += ((baseX * (1 - influence) + targetX * influence) - point.x) * settle
-        point.y += ((baseY * (1 - influence) + targetY * influence) - point.y) * settle
-        context.fillStyle = point.accent ? 'rgba(164, 113, 184, .42)' : 'rgba(36, 87, 255, .38)'
+        const influence = Math.max(0, 1 - distance / 180)
+        const tangentAngle = Math.atan2(dy, dx) + Math.PI / 2
+        const tangentForce = influence * 0.12
+        const magneticForce = influence * 0.045
+        const springForce = 0.03
+        point.vx += Math.cos(tangentAngle) * tangentForce - dx * magneticForce - (point.x - homeX) * springForce
+        point.vy += Math.sin(tangentAngle) * tangentForce - dy * magneticForce - (point.y - homeY) * springForce
+        point.vx *= 0.88
+        point.vy *= 0.88
+        point.x += point.vx
+        point.y += point.vy
+        context.fillStyle = point.color
         if (point.dash) context.fillRect(point.x, point.y, point.size + 2, 1)
         else context.fillRect(point.x, point.y, point.size, point.size)
       })
