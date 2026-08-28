@@ -75,16 +75,21 @@ function ParticleField() {
       const height = hero.clientHeight
       context.clearRect(0, 0, width, height)
       points.forEach((point) => {
-        const baseX = (point.x / 100) * width
-        const baseY = (point.y / 100) * height
-        const dx = baseX - pointer.x
-        const dy = baseY - pointer.y
-        const distance = Math.sqrt(dx * dx + dy * dy)
-        const influence = Math.max(0, 1 - distance / 130)
-        const x = baseX + (dx / Math.max(distance, 1)) * influence * 7
-        const y = baseY + (dy / Math.max(distance, 1)) * influence * 7
-        context.fillStyle = point.accent ? 'rgba(164, 113, 184, .42)' : 'rgba(36, 87, 255, .38)'
-        context.fillRect(x, y, point.size, point.size)
+      const baseX = point.baseX * width
+      const baseY = point.baseY * height
+      const dx = baseX - pointer.x
+      const dy = baseY - pointer.y
+      const distance = Math.sqrt(dx * dx + dy * dy)
+      const influence = Math.max(0, 1 - distance / 170)
+      const angle = Math.atan2(dy, dx) + influence * 0.7
+      const orbitRadius = distance + influence * 22
+      const targetX = pointer.x + Math.cos(angle) * orbitRadius
+      const targetY = pointer.y + Math.sin(angle) * orbitRadius
+      point.x += ((baseX + (targetX - baseX) * influence) - point.x) * 0.12
+      point.y += ((baseY + (targetY - baseY) * influence) - point.y) * 0.12
+      context.fillStyle = point.accent ? 'rgba(164, 113, 184, .42)' : 'rgba(36, 87, 255, .38)'
+      if (point.dash) context.fillRect(point.x, point.y, point.size + 2, 1)
+      else context.fillRect(point.x, point.y, point.size, point.size)
       })
       frame = requestAnimationFrame(draw)
     }
