@@ -54,6 +54,7 @@ function ParticleField() {
       size: random(index * 3 + 4) > 0.82 ? 2 : 1,
       dash: random(index * 5 + 7) > 0.72,
       accent: random(index * 7 + 9) > 0.97,
+      phase: random(index * 11 + 12) * Math.PI * 2,
     }))
     const pointer = { x: -1000, y: -1000 }
     let frame = 0
@@ -70,26 +71,28 @@ function ParticleField() {
       pointer.x = event.clientX - bounds.left
       pointer.y = event.clientY - bounds.top
     }
-    const draw = () => {
+    const draw = (time: number) => {
       const width = hero.clientWidth
       const height = hero.clientHeight
       context.clearRect(0, 0, width, height)
       points.forEach((point) => {
-      const baseX = point.baseX * width
-      const baseY = point.baseY * height
-      const dx = baseX - pointer.x
-      const dy = baseY - pointer.y
-      const distance = Math.sqrt(dx * dx + dy * dy)
-      const influence = Math.max(0, 1 - distance / 170)
-      const angle = Math.atan2(dy, dx) + influence * 0.7
-      const orbitRadius = distance + influence * 22
-      const targetX = pointer.x + Math.cos(angle) * orbitRadius
-      const targetY = pointer.y + Math.sin(angle) * orbitRadius
-      point.x += ((baseX + (targetX - baseX) * influence) - point.x) * 0.12
-      point.y += ((baseY + (targetY - baseY) * influence) - point.y) * 0.12
-      context.fillStyle = point.accent ? 'rgba(164, 113, 184, .42)' : 'rgba(36, 87, 255, .38)'
-      if (point.dash) context.fillRect(point.x, point.y, point.size + 2, 1)
-      else context.fillRect(point.x, point.y, point.size, point.size)
+        const baseX = point.baseX * width
+        const baseY = point.baseY * height
+        if (point.x === 0 && point.y === 0) { point.x = baseX; point.y = baseY }
+        const dx = point.x - pointer.x
+        const dy = point.y - pointer.y
+        const distance = Math.sqrt(dx * dx + dy * dy)
+        const influence = Math.max(0, 1 - distance / 190)
+        const orbit = influence * (0.018 + Math.sin(time * 0.001 + point.phase) * 0.008)
+        const radiusPush = influence * 0.18
+        const targetX = pointer.x + (dx * Math.cos(orbit) - dy * Math.sin(orbit)) * (1 + radiusPush)
+        const targetY = pointer.y + (dx * Math.sin(orbit) + dy * Math.cos(orbit)) * (1 + radiusPush)
+        const settle = 0.08 + influence * 0.08
+        point.x += ((baseX * (1 - influence) + targetX * influence) - point.x) * settle
+        point.y += ((baseY * (1 - influence) + targetY * influence) - point.y) * settle
+        context.fillStyle = point.accent ? 'rgba(164, 113, 184, .42)' : 'rgba(36, 87, 255, .38)'
+        if (point.dash) context.fillRect(point.x, point.y, point.size + 2, 1)
+        else context.fillRect(point.x, point.y, point.size, point.size)
       })
       frame = requestAnimationFrame(draw)
     }
