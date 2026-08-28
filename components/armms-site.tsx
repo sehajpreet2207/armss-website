@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import { ArrowUpRight, BrainCircuit, Cpu, Menu, MoveRight, Network, Settings2, Wrench, X } from 'lucide-react'
 
 const joinUrl = 'https://docs.google.com/forms/d/e/1FAIpQLSd4JSOaJXuagxt5x-fU-nzsQc2FaBTK4yFw_QftLPHgGHPEUQ/viewform?pli=1&utm_source=ig&utm_medium=social&utm_content=link_in_bio'
@@ -33,94 +33,13 @@ const faqs = [
 function Mark({ light = false }: { light?: boolean }) { return <div className={`flex items-center gap-3 ${light ? 'text-white' : 'text-foreground'}`}><span className="armms-mark"><i /><i /><i /></span><span className="font-mono text-sm font-bold tracking-[0.22em]">ARMSS</span></div> }
 function Reveal({ children, className = '' }: { children: React.ReactNode; className?: string }) { return <div className={`reveal ${className}`}>{children}</div> }
 
-function ParticleField() {
-  const canvasRef = useRef<HTMLCanvasElement>(null)
-
-  useEffect(() => {
-    const canvas = canvasRef.current
-    const hero = document.getElementById('home')
-    if (!canvas || !hero || window.matchMedia('(prefers-reduced-motion: reduce), (pointer: coarse)').matches) return
-    const context = canvas.getContext('2d')
-    if (!context) return
-    const random = (seed: number) => {
-      const value = Math.sin(seed * 12.9898) * 43758.5453
-      return value - Math.floor(value)
-    }
-    const colors = ['#ea4335', '#4285f4', '#fbbc05', '#34a853', '#202124']
-    const points = Array.from({ length: 1200 }, (_, index) => ({
-      homeX: random(index * 2 + 1),
-      homeY: random(index * 2 + 2),
-      x: 0,
-      y: 0,
-      vx: 0,
-      vy: 0,
-      size: random(index * 3 + 4) * 2.5 + 1.5,
-      color: colors[Math.floor(random(index * 5 + 7) * colors.length)],
-    }))
-    const pointer = { x: -1000, y: -1000 }
-    let frame = 0
-    const resize = () => {
-      const ratio = Math.min(window.devicePixelRatio || 1, 2)
-      canvas.width = hero.clientWidth * ratio
-      canvas.height = hero.clientHeight * ratio
-      canvas.style.width = `${hero.clientWidth}px`
-      canvas.style.height = `${hero.clientHeight}px`
-      context.setTransform(ratio, 0, 0, ratio, 0, 0)
-    }
-    const move = (event: PointerEvent) => {
-      const bounds = hero.getBoundingClientRect()
-      pointer.x = event.clientX - bounds.left
-      pointer.y = event.clientY - bounds.top
-    }
-    const draw = (time: number) => {
-      const width = hero.clientWidth
-      const height = hero.clientHeight
-      context.clearRect(0, 0, width, height)
-      points.forEach((point) => {
-        const homeX = point.homeX * width
-        const homeY = point.homeY * height
-        if (point.x === 0 && point.y === 0) { point.x = homeX; point.y = homeY }
-        const dx = point.x - pointer.x
-        const dy = point.y - pointer.y
-        const distance = Math.sqrt(dx * dx + dy * dy)
-        if (distance < 180 && distance > 0) {
-          const force = 1 - distance / 180
-          const tangentAngle = Math.atan2(dy, dx) + Math.PI / 2
-          const rotateForce = force * 1.8
-          const pullForce = force * 0.5
-          point.vx += Math.cos(tangentAngle) * rotateForce + (dx / distance) * pullForce
-          point.vy += Math.sin(tangentAngle) * rotateForce + (dy / distance) * pullForce
-        }
-        const springForce = 0.03
-        point.vx += (homeX - point.x) * springForce
-        point.vy += (homeY - point.y) * springForce
-        point.vx *= 0.88
-        point.vy *= 0.88
-        point.x += point.vx
-        point.y += point.vy
-        context.fillStyle = point.color
-        if (point.dash) context.fillRect(point.x, point.y, point.size + 2, 1)
-        else context.fillRect(point.x, point.y, point.size, point.size)
-      })
-      frame = requestAnimationFrame(draw)
-    }
-    resize()
-    window.addEventListener('resize', resize)
-    hero.addEventListener('pointermove', move)
-    frame = requestAnimationFrame(draw)
-    return () => { window.removeEventListener('resize', resize); hero.removeEventListener('pointermove', move); cancelAnimationFrame(frame) }
-  }, [])
-
-  return <canvas ref={canvasRef} className="particle-field" aria-hidden="true" />
-}
-
 export function Navbar() {
   const [open, setOpen] = useState(false)
   const links = [['About', 'about'], ['Domains', 'domains'], ['Workshops', 'workshops'], ['TechTales', 'techtales'], ['Membership', 'membership'], ['Team', 'team']]
   return <header className="navbar"><div className="shell flex h-20 items-center justify-between"><a href="#home" aria-label="ARMSS home"><Mark /></a><nav className="hidden items-center gap-7 md:flex">{links.map(([label, id]) => <a key={id} href={`#${id}`} className="nav-link">{label}</a>)}</nav><a href={joinUrl} target="_blank" rel="noopener noreferrer" className="button button-blue hidden md:inline-flex">JOIN ARMSS <ArrowUpRight size={16} /></a><button className="md:hidden" aria-label={open ? 'Close menu' : 'Open menu'} onClick={() => setOpen(!open)}>{open ? <X /> : <Menu />}</button></div>{open && <div className="mobile-menu md:hidden">{links.map(([label, id]) => <a key={id} href={`#${id}`} onClick={() => setOpen(false)}>{label}<MoveRight size={16} /></a>)}<a href={joinUrl} target="_blank" rel="noopener noreferrer">JOIN ARMSS <ArrowUpRight size={16} /></a></div>}</header>
 }
 
-export function Hero() { return <section id="home" className="hero"><ParticleField /><div className="shell hero-inner"><Reveal><p className="section-kicker">ARMSS / GNDU <span /></p><h1 className="hero-title">ARMSS<em>.</em></h1><p className="hero-copy">Artificial Intelligence, Robotics &amp; Mechanical Engineering Student Society.</p><div className="hero-subline"><span>GNDU / AMRITSAR</span></div><div className="mt-9 flex flex-wrap gap-3"><a href={joinUrl} target="_blank" rel="noopener noreferrer" className="button button-blue">JOIN ARMSS <ArrowUpRight size={17} /></a><a href="#about" className="button button-outline">EXPLORE <MoveRight size={17} /></a></div></Reveal></div></section> }
+export function Hero() { return <section id="home" className="hero"><div className="shell hero-inner"><Reveal><p className="section-kicker">ARMSS / GNDU <span /></p><h1 className="hero-title">ARMSS<em>.</em></h1><p className="hero-copy">Artificial Intelligence, Robotics &amp; Mechanical Engineering Student Society.</p><div className="hero-subline"><span>GNDU / AMRITSAR</span></div><div className="mt-9 flex flex-wrap gap-3"><a href={joinUrl} target="_blank" rel="noopener noreferrer" className="button button-blue">JOIN ARMSS <ArrowUpRight size={17} /></a><a href="#about" className="button button-outline">EXPLORE <MoveRight size={17} /></a></div></Reveal></div></section> }
 
 export function About() { return <section id="about" className="section section-light"><div className="shell"><Reveal><p className="section-kicker">01 / ABOUT <span /></p></Reveal><div className="about-grid"><Reveal><h2 className="display-title">MORE THAN<br /><em>A SOCIETY.</em></h2></Reveal><Reveal><p className="lead-copy">A place to turn curiosity into capability.</p><p className="body-copy">ARMSS brings together students who want to learn beyond the classroom, make useful things, and work across disciplines. Start anywhere. Build with us.</p></Reveal></div><div className="principles">{principles.map(([n, title, text]) => <div className="principle" key={n}><span className="principle-num">{n}</span><h3>{title}</h3><p>{text}</p></div>)}</div></div></section> }
 
