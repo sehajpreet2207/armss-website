@@ -47,16 +47,15 @@ function ParticleField() {
       return value - Math.floor(value)
     }
     const colors = ['#ea4335', '#4285f4', '#fbbc05', '#34a853', '#202124']
-    const points = Array.from({ length: 260 }, (_, index) => ({
+    const points = Array.from({ length: 1200 }, (_, index) => ({
       homeX: random(index * 2 + 1),
       homeY: random(index * 2 + 2),
       x: 0,
       y: 0,
       vx: 0,
       vy: 0,
-      size: random(index * 3 + 4) > 0.86 ? 2 : 1,
-      dash: random(index * 5 + 7) > 0.8,
-      color: colors[index % colors.length],
+      size: random(index * 3 + 4) * 2.5 + 1.5,
+      color: colors[Math.floor(random(index * 5 + 7) * colors.length)],
     }))
     const pointer = { x: -1000, y: -1000 }
     let frame = 0
@@ -84,13 +83,17 @@ function ParticleField() {
         const dx = point.x - pointer.x
         const dy = point.y - pointer.y
         const distance = Math.sqrt(dx * dx + dy * dy)
-        const influence = Math.max(0, 1 - distance / 180)
-        const tangentAngle = Math.atan2(dy, dx) + Math.PI / 2
-        const tangentForce = influence * 0.12
-        const magneticForce = influence * 0.045
+        if (distance < 180 && distance > 0) {
+          const force = 1 - distance / 180
+          const tangentAngle = Math.atan2(dy, dx) + Math.PI / 2
+          const rotateForce = force * 1.8
+          const pullForce = force * 0.5
+          point.vx += Math.cos(tangentAngle) * rotateForce + (dx / distance) * pullForce
+          point.vy += Math.sin(tangentAngle) * rotateForce + (dy / distance) * pullForce
+        }
         const springForce = 0.03
-        point.vx += Math.cos(tangentAngle) * tangentForce - dx * magneticForce - (point.x - homeX) * springForce
-        point.vy += Math.sin(tangentAngle) * tangentForce - dy * magneticForce - (point.y - homeY) * springForce
+        point.vx += (homeX - point.x) * springForce
+        point.vy += (homeY - point.y) * springForce
         point.vx *= 0.88
         point.vy *= 0.88
         point.x += point.vx
